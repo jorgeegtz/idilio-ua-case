@@ -141,7 +141,7 @@ export default function DeliverableA() {
                     <td className="mono">{fmt.pct(v.budget/total)}</td>
                     <td className="mono" style={{color:'var(--green)'}}>{fmt.usd(v.d7rev)}</td>
                     <td className="mono" style={{color:v.d7rev/v.spend>=0.35?'var(--green)':v.d7rev/v.spend>=0.20?'var(--amber)':'var(--red)'}}>{fmt.pct(v.d7rev/v.spend)}</td>
-                    {breakdown!=='canal'&&<td className="mono">{fmt.num((v as {installs:number}).installs)}</td>}
+                    {breakdown!=='canal'&&<td className="mono">{fmt.num((v as unknown as {installs:number}).installs)}</td>}
                   </tr>
                 ))}
               </tbody>

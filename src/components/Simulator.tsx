@@ -12,7 +12,7 @@ export default function Simulator() {
   const [budget, setBudget] = useState(TOTAL_BUDGET_MONTHLY);
   const [caps, setCaps] = useState<Record<string,number>>(Object.fromEntries(activeCampaigns.filter(c=>c.curveA>0).map(c=>[c.id,c.proposedMonthly])));
 
-  const channels = useMemo(() => BASE_CHANNELS.map(c => ({ ...c, maxSpendDaily: (caps[c.id] ?? c.proposedMonthly) / 30 })), [caps]);
+  const channels = useMemo(() => BASE_CHANNELS.map(c => ({ ...c, maxSpendDaily: (caps[c.id] ?? activeCampaigns.find(a=>a.id===c.id)?.proposedMonthly ?? 0) / 30 })), [caps]);
   const result = useMemo(() => waterfallAllocate(budget / 30, channels), [budget, channels]);
   const sweep = useMemo(() => scenarioSweep(60000, 200000, channels, 30).map(p => ({ budget: Math.round(p.budget/1000), revenue: Math.round(p.monthlyRev), roas: parseFloat((p.roas*100).toFixed(1)) })), [channels]);
   const allocMap = Object.fromEntries(result.allocations.map(a => [a.campaignId, a]));
@@ -77,7 +77,7 @@ export default function Simulator() {
                 <XAxis dataKey="budget" tickFormatter={v=>`$${v}K`} stroke="var(--text-3)" tick={{fontSize:10,fill:'var(--text-2)'}}/>
                 <YAxis yAxisId="rev" tickFormatter={v=>`$${(v/1000).toFixed(0)}K`} stroke="var(--text-3)" tick={{fontSize:10,fill:'var(--text-2)'}}/>
                 <YAxis yAxisId="roas" orientation="right" tickFormatter={v=>`${v}%`} stroke="var(--text-3)" tick={{fontSize:10,fill:'var(--text-2)'}}/>
-                <Tooltip contentStyle={{background:'var(--bg-3)',border:'1px solid var(--border)',borderRadius:8,fontSize:12}} formatter={(val:number,name:string)=>name==='revenue'?[`$${(val/1000).toFixed(1)}K`,'Rev']:[`${val}%`,'ROAS']} labelFormatter={v=>`$${v}K/mo`}/>
+                <Tooltip contentStyle={{background:'var(--bg-3)',border:'1px solid var(--border)',borderRadius:8,fontSize:12}} formatter={(val:unknown)=>[`${val}`,'']} labelFormatter={v=>`$${v}K/mo`}/>
                 <Legend wrapperStyle={{fontSize:11}}/>
                 <ReferenceLine yAxisId="rev" x={Math.round(budget/1000)} stroke="var(--rose)" strokeDasharray="4 2"/>
                 <Line yAxisId="rev" dataKey="revenue" name="Revenue" stroke="var(--green)" strokeWidth={2} dot={false}/>
