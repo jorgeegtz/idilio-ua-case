@@ -71,8 +71,8 @@ export default function Simulator() {
         </div>
 
         <div>
-          <div className="card" style={{padding:'20px 8px 8px'}}>
-            <ResponsiveContainer width="100%" height={320} minWidth={300}>
+          <div className="card" style={{padding:"20px 8px 8px",height:360}}>
+            <ResponsiveContainer width="100%" height={300}>
               <LineChart data={sweep} margin={{top:4,right:24,bottom:4,left:8}}>
                 <XAxis dataKey="budget" tickFormatter={v=>`$${v}K`} stroke="var(--text-3)" tick={{fontSize:10,fill:'var(--text-2)'}}/>
                 <YAxis yAxisId="rev" tickFormatter={v=>`$${(v/1000).toFixed(0)}K`} stroke="var(--text-3)" tick={{fontSize:10,fill:'var(--text-2)'}}/>
