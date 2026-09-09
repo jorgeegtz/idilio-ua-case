@@ -9,10 +9,10 @@ import { activeCampaigns, TOTAL_BUDGET_MONTHLY } from './data/campaigns';
 
 const NAV_LINKS = [
   { href: '#executive-summary', label: 'Summary' },
-  { href: '#deliverable-a',     label: 'A · Budget' },
-  { href: '#deliverable-b',     label: 'B · Memo' },
-  { href: '#deliverable-c',     label: 'C · Ops' },
-  { href: '#simulator',         label: '⚡ Simulator' },
+  { href: '#deliverable-a', label: 'A · Budget' },
+  { href: '#deliverable-b', label: 'B · Memo' },
+  { href: '#deliverable-c', label: 'C · Ops' },
+  { href: '#simulator', label: '⚡ Simulator' },
 ];
 
 const channels = activeCampaigns
@@ -46,7 +46,9 @@ export default function App() {
                 href={l.href}
                 className={activeSection === l.href.slice(1) ? 'active' : ''}
                 onClick={e => { e.preventDefault(); document.querySelector(l.href)?.scrollIntoView({ behavior: 'smooth' }); }}
-              >{l.label}</a>
+              >
+                {l.label}
+              </a>
             </li>
           ))}
         </ul>
@@ -62,11 +64,11 @@ export default function App() {
           </p>
           <div className="hero-stats">
             {[
-              { label: 'Total Budget',     value: fmt.usd(TOTAL_BUDGET_MONTHLY), cls: 'rose' },
-              { label: 'Fcast D7 Rev/mo',  value: fmt.usd(baseResult.totalMonthlyRev), cls: 'green' },
-              { label: 'Blended ROAS',     value: fmt.pct(baseResult.blendedRoas), cls: '' },
+              { label: 'Total Budget', value: fmt.usd(TOTAL_BUDGET_MONTHLY), cls: 'rose' },
+              { label: 'Fcast D7 Rev/mo', value: fmt.usd(baseResult.totalMonthlyRev), cls: 'green' },
+              { label: 'Blended ROAS', value: fmt.pct(baseResult.blendedRoas), cls: '' },
               { label: 'Campañas activas', value: '11 de 12', cls: '' },
-              { label: 'Candidato',        value: 'Jorge E. Gutiérrez', cls: '' },
+              { label: 'Candidato', value: 'Jorge E. Gutiérrez', cls: '' },
             ].map(s => (
               <div className="stat-card" key={s.label}>
                 <div className="stat-label">{s.label}</div>
