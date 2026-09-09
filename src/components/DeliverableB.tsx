@@ -4,9 +4,9 @@ export default function DeliverableB() {
       <div className="section-header">
         <span className="section-tag">Deliverable B</span>
         <h2>Decision Memo</h2>
-        <p>5 minutos. Todo lo que necesitas saber.</p>
+        <p></p>
       </div>
-      <div className="card memo-body">
+      <div className="card" style={{width:"100%"}}>
         <h3>1. Métrica rectora</h3>
         <p><strong>D7 ROAS en base Singular.</strong> Deduplica entre canales y no infla iOS. El spreadsheet reporta 43.5% blended usando revenue de plataforma, el número real es 35.1%. La diferencia son 8 puntos de iOS con SKAN mal configurado. D30/D7 como señal secundaria de maduración. mROAS del modelo de curva de potencia como trigger de escala.</p>
         <h3>2. Cuando MMP y plataforma no cuadran</h3>
