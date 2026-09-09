@@ -7,71 +7,55 @@ import ExecutiveSummary from './components/ExecutiveSummary';
 import { fmt, waterfallAllocate } from './lib/powerCurve';
 import { activeCampaigns, TOTAL_BUDGET_MONTHLY } from './data/campaigns';
 
-const NAV_LINKS = [
+const NAV = [
   { href: '#executive-summary', label: 'Summary' },
-  { href: '#deliverable-a', label: 'A · Budget' },
-  { href: '#deliverable-b', label: 'B · Memo' },
-  { href: '#deliverable-c', label: 'C · Ops' },
-  { href: '#simulator', label: '⚡ Simulator' },
+  { href: '#deliverable-a', label: 'A Budget' },
+  { href: '#deliverable-b', label: 'B Memo' },
+  { href: '#deliverable-c', label: 'C Ops' },
+  { href: '#simulator', label: 'Simulator' },
 ];
 
-const channels = activeCampaigns
-  .filter(c => c.curveA > 0)
-  .map(c => ({ id: c.id, params: { a: c.curveA, b: c.curveB }, minSpendDaily: 10, maxSpendDaily: (c.proposedMonthly / 30) * 2.5 }));
-const baseResult = waterfallAllocate(TOTAL_BUDGET_MONTHLY / 30, channels);
+const ch = activeCampaigns.filter(c => c.curveA > 0).map(c => ({ id: c.id, params: { a: c.curveA, b: c.curveB }, minSpendDaily: 10, maxSpendDaily: (c.proposedMonthly / 30) * 2.5 }));
+const base = waterfallAllocate(TOTAL_BUDGET_MONTHLY / 30, ch);
 
-function handleNav(href: string) {
-  document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
-}
+function nav(href: string) { document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' }); }
 
 export default function App() {
-  const [activeSection, setActiveSection] = useState('executive-summary');
-
+  const [active, setActive] = useState('executive-summary');
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) setActiveSection(e.target.id); }),
-      { rootMargin: '-40% 0px -55% 0px' },
+    const obs = new IntersectionObserver(
+      es => es.forEach(e => { if (e.isIntersecting) setActive(e.target.id); }),
+      { rootMargin: '-40% 0px -55% 0px' }
     );
-    document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
-    return () => observer.disconnect();
+    document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+    return () => obs.disconnect();
   }, []);
 
   return (
     <div className="app">
       <nav className="topnav">
-        <div className="brand">
-          <span className="dot" />
-          <span>Idilio TV · UA Case</span>
-        </div>
+        <div className="brand"><span className="dot" /><span>Idilio TV UA Case</span></div>
         <ul className="nav-links">
-          {NAV_LINKS.map(l => (
+          {NAV.map(l => (
             <li key={l.href}>
-              
-                href={l.href}
-                className={activeSection === l.href.slice(1) ? 'active' : ''}
-                onClick={() => handleNav(l.href)}
-              >
+              <a href={l.href} className={active === l.href.slice(1) ? 'active' : ''} onClick={e => { e.preventDefault(); nav(l.href); }}>
                 {l.label}
               </a>
             </li>
           ))}
         </ul>
       </nav>
-
       <div className="content-area">
         <header className="hero">
-          <p className="hero-eyebrow">Media Buyer / UA Case — Idilio TV</p>
-          <h1><em>$120,000</em> budget.<br />One decision framework.</h1>
-          <p className="hero-sub">
-            Análisis completo de UA para una app de micro-dramas en español — MX, CO y US-Hispano.
-          </p>
+          <p className="hero-eyebrow">Media Buyer UA Case Idilio TV</p>
+          <h1><em>$120,000</em> budget. One framework.</h1>
+          <p className="hero-sub">UA para micro-dramas en espanol. MX, CO y US-Hispano. Singular basis.</p>
           <div className="hero-stats">
             {[
-              { label: 'Total Budget', value: fmt.usd(TOTAL_BUDGET_MONTHLY), cls: 'rose' },
-              { label: 'Fcast D7 Rev/mo', value: fmt.usd(baseResult.totalMonthlyRev), cls: 'green' },
-              { label: 'Blended ROAS', value: fmt.pct(baseResult.blendedRoas), cls: '' },
-              { label: 'Campañas activas', value: '11 de 12', cls: '' },
-              { label: 'Candidato', value: 'Jorge E. Gutiérrez', cls: '' },
+              { label: 'Budget', value: fmt.usd(TOTAL_BUDGET_MONTHLY), cls: 'rose' },
+              { label: 'Fcast Rev mo', value: fmt.usd(base.totalMonthlyRev), cls: 'green' },
+              { label: 'ROAS', value: fmt.pct(base.blendedRoas), cls: '' },
+              { label: 'Candidato', value: 'Jorge E Gutierrez', cls: '' },
             ].map(s => (
               <div className="stat-card" key={s.label}>
                 <div className="stat-label">{s.label}</div>
@@ -80,7 +64,6 @@ export default function App() {
             ))}
           </div>
         </header>
-
         <ExecutiveSummary />
         <hr className="divider" />
         <DeliverableA />
@@ -90,12 +73,8 @@ export default function App() {
         <DeliverableC />
         <hr className="divider" />
         <Simulator />
-
         <footer>
-          <p>Jorge E. Gutiérrez · UA Media Buyer Case · Idilio TV</p>
-          <p style={{ marginTop: 6, fontSize: 11 }}>
-            Base Singular (MMP) · Power curve model · Platform spend as billed
-          </p>
+          <p>Jorge E Gutierrez · UA Media Buyer Case · Idilio TV</p>
         </footer>
       </div>
     </div>

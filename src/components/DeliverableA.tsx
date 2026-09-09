@@ -1,161 +1,217 @@
-import { Fragment, useMemo, useState } from 'react';
-import type { Action } from '../data/campaigns';
-import { campaigns } from '../data/campaigns';
+import { useState, useMemo } from 'react';
+import { campaigns, TOTAL_BUDGET_MONTHLY } from '../data/campaigns';
 import { fmt } from '../lib/powerCurve';
+import type { Action } from '../data/campaigns';
 
-export const ACTION_META: Record<Action, { label: string; color: string; bg: string }> = {
-  SCALE: { label: 'Scale', color: 'var(--scale)', bg: 'var(--scale-bg)' },
-  RAISE: { label: 'Raise', color: 'var(--raise)', bg: 'var(--raise-bg)' },
-  HOLD: { label: 'Hold', color: 'var(--hold)', bg: 'var(--hold-bg)' },
-  TEST: { label: 'Test', color: 'var(--test)', bg: 'var(--test-bg)' },
-  AUDIT: { label: 'Audit', color: 'var(--audit)', bg: 'var(--audit-bg)' },
-  MIGRATE: { label: 'Migrate', color: 'var(--migrate)', bg: 'var(--migrate-bg)' },
-  KILL: { label: 'Kill', color: 'var(--kill)', bg: 'var(--kill-bg)' },
+type SortKey = 'proposedMonthly' | 'd7Roas' | 'd30Roas' | 'cpi' | 'installGapPct' | 'd30d7Ratio' | 'totalSpend' | 'singularInstalls';
+type BreakdownView = 'campaign' | 'geo' | 'canal' | 'os';
+
+const ACTION_COLOR: Record<Action, string> = {
+  SCALE: '#22c55e', RAISE: '#60a5fa', HOLD: '#fbbf24',
+  AUDIT: '#fb923c', MIGRATE: '#38bdf8', KILL: '#ef4444', TEST: '#c084fc',
+};
+const ACTION_DESC: Record<Action, string> = {
+  SCALE: 'Aumentar presupuesto. ROAS solido, senal limpia, canal no saturado.',
+  RAISE: 'Subir gradualmente. D30/D7 indica revenue que llega despues del D7.',
+  HOLD: 'Mantener. Senal parcial o saturacion cercana. Monitorear antes de mover.',
+  AUDIT: 'ROAS alto pero incrementalidad dudosa. No escalar sin holdout test.',
+  MIGRATE: 'Canal valido pero objetivo de puja incorrecto. Cambiar antes de escalar.',
+  KILL: 'Pausar. Tráfico de baja calidad o atribucion completamente ciega.',
+  TEST: 'Nueva linea sin historico. Budget fijo 14 dias, no escalar.',
 };
 
-function ActionBadge({ action }: { action: Action }) {
-  const meta = ACTION_META[action];
-  return (
-    <span className="badge" style={{ color: meta.color, background: meta.bg }}>
-      {meta.label}
-    </span>
-  );
-}
-
-const ACTIONS_ORDER: Action[] = ['SCALE', 'RAISE', 'TEST', 'HOLD', 'AUDIT', 'MIGRATE', 'KILL'];
-
 export default function DeliverableA() {
-  const [filter, setFilter] = useState<Action | 'ALL'>('ALL');
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>('proposedMonthly');
+  const [sortDir, setSortDir] = useState<'asc'|'desc'>('desc');
+  const [filter, setFilter] = useState<Action|'ALL'>('ALL');
+  const [breakdown, setBreakdown] = useState<BreakdownView>('campaign');
+  const [showGlossary, setShowGlossary] = useState(false);
 
-  const sorted = useMemo(
-    () => [...campaigns].sort((a, b) => b.proposedMonthly - a.proposedMonthly),
-    [],
+  function handleSort(k: SortKey) {
+    if (k === sortKey) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortKey(k); setSortDir('desc'); }
+  }
+
+  const filtered = useMemo(() =>
+    campaigns.filter(c => filter === 'ALL' || c.action === filter)
+      .sort((a, b) => (a[sortKey] - b[sortKey]) * (sortDir === 'asc' ? 1 : -1)),
+    [filter, sortKey, sortDir]
   );
 
-  const rows = filter === 'ALL' ? sorted : sorted.filter((c) => c.action === filter);
-
-  const totals = useMemo(() => {
-    const totalSpend = campaigns.reduce((s, c) => s + c.totalSpend, 0);
-    const totalRevD7 = campaigns.reduce((s, c) => s + c.singularRevD7, 0);
-    const totalRevD30 = campaigns.reduce((s, c) => s + c.singularRevD30, 0);
-    const scaleCount = campaigns.filter((c) => c.action === 'SCALE').length;
-    const killCount = campaigns.filter((c) => c.action === 'KILL').length;
-    return {
-      totalSpend,
-      blendedD7: totalSpend > 0 ? totalRevD7 / totalSpend : 0,
-      blendedD30: totalSpend > 0 ? totalRevD30 / totalSpend : 0,
-      scaleCount,
-      killCount,
-    };
+  const geoMap = useMemo(() => {
+    const m: Record<string,{spend:number,budget:number,d7rev:number,installs:number}> = {};
+    campaigns.forEach(c => {
+      if (!m[c.geo]) m[c.geo] = {spend:0,budget:0,d7rev:0,installs:0};
+      m[c.geo].spend += c.totalSpend; m[c.geo].budget += c.proposedMonthly;
+      m[c.geo].d7rev += c.singularRevD7; m[c.geo].installs += c.singularInstalls;
+    });
+    return Object.entries(m).sort((a,b) => b[1].budget - a[1].budget);
   }, []);
 
-  const presentActions = ACTIONS_ORDER.filter((a) => campaigns.some((c) => c.action === a));
+  const canalMap = useMemo(() => {
+    const m: Record<string,{spend:number,budget:number,d7rev:number}> = {};
+    campaigns.forEach(c => {
+      if (!m[c.canal]) m[c.canal] = {spend:0,budget:0,d7rev:0};
+      m[c.canal].spend += c.totalSpend; m[c.canal].budget += c.proposedMonthly; m[c.canal].d7rev += c.singularRevD7;
+    });
+    return Object.entries(m).sort((a,b) => b[1].budget - a[1].budget);
+  }, []);
+
+  const osMap = useMemo(() => {
+    const m: Record<string,{spend:number,budget:number,d7rev:number,installs:number}> = {};
+    campaigns.forEach(c => {
+      if (!m[c.os]) m[c.os] = {spend:0,budget:0,d7rev:0,installs:0};
+      m[c.os].spend += c.totalSpend; m[c.os].budget += c.proposedMonthly;
+      m[c.os].d7rev += c.singularRevD7; m[c.os].installs += c.singularInstalls;
+    });
+    return Object.entries(m).sort((a,b) => b[1].budget - a[1].budget);
+  }, []);
+
+  const total = campaigns.reduce((s,c) => s + c.proposedMonthly, 0);
+  const SortIcon = ({k}: {k:SortKey}) => <span style={{marginLeft:4,color:sortKey===k?'var(--rose)':'var(--text-3)'}}>{sortKey===k?(sortDir==='desc'?'↓':'↑'):'↕'}</span>;
+  const Th = ({k,children}:{k:SortKey,children:React.ReactNode}) => <th onClick={()=>handleSort(k)} style={{cursor:'pointer'}}>{children}<SortIcon k={k}/></th>;
+  const actions: (Action|'ALL')[] = ['ALL','SCALE','RAISE','TEST','AUDIT','MIGRATE','HOLD','KILL'];
+  const views: {key:BreakdownView,label:string}[] = [{key:'campaign',label:'Campana'},{key:'geo',label:'Geo'},{key:'canal',label:'Canal'},{key:'os',label:'OS'}];
 
   return (
-    <div>
-      <div className="section-head">
-        <h2>Deliverable A — Performance &amp; Recommendations</h2>
-        <p>
-          All 13 campaign lines audited on Singular-verified spend, D7/D30 ROAS and install
-          discrepancy, with a scale/hold/kill recommendation for each.
-        </p>
+    <section id="deliverable-a">
+      <div className="section-header">
+        <span className="section-tag">Deliverable A</span>
+        <h2>Budget Allocation — 30 dias</h2>
+        <p>Total: <strong style={{color:'var(--text-0)'}}>{fmt.usd(TOTAL_BUDGET_MONTHLY)}</strong> · Revenue: Singular · Spend: plataforma as billed</p>
       </div>
 
-      <div className="stat-grid">
-        <div className="stat-card">
-          <span className="stat-label">Total Spend (period)</span>
-          <span className="stat-value">{fmt.usd(totals.totalSpend)}</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-label">Blended D7 ROAS</span>
-          <span className="stat-value">{fmt.pct(totals.blendedD7)}</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-label">Blended D30 ROAS</span>
-          <span className="stat-value">{fmt.pct(totals.blendedD30)}</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-label">Scale calls</span>
-          <span className="stat-value" style={{ color: 'var(--scale)' }}>
-            {totals.scaleCount}
-          </span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-label">Kill calls</span>
-          <span className="stat-value" style={{ color: 'var(--kill)' }}>
-            {totals.killCount}
-          </span>
-        </div>
-      </div>
-
-      <div className="chip-row">
-        <button
-          type="button"
-          className={`chip ${filter === 'ALL' ? 'active' : ''}`}
-          onClick={() => setFilter('ALL')}
-        >
-          All ({campaigns.length})
-        </button>
-        {presentActions.map((a) => (
-          <button
-            key={a}
-            type="button"
-            className={`chip ${filter === a ? 'active' : ''}`}
-            onClick={() => setFilter(a)}
-          >
-            {ACTION_META[a].label} ({campaigns.filter((c) => c.action === a).length})
-          </button>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:12,marginBottom:24}}>
+        {[
+          {label:'Total Budget',value:fmt.usd(total),cls:'rose'},
+          {label:'Campanas activas',value:`${campaigns.filter(c=>c.proposedMonthly>0).length} / ${campaigns.length}`,cls:''},
+          {label:'Android %',value:fmt.pct(campaigns.filter(c=>c.os==='Android').reduce((s,c)=>s+c.proposedMonthly,0)/total),cls:'green'},
+          {label:'MX + CO %',value:fmt.pct(campaigns.filter(c=>c.geo==='MX'||c.geo==='CO').reduce((s,c)=>s+c.proposedMonthly,0)/total),cls:'green'},
+          {label:'iOS cap',value:fmt.usd(campaigns.filter(c=>c.os==='iOS').reduce((s,c)=>s+c.proposedMonthly,0)),cls:''},
+        ].map(k=>(
+          <div className="stat-card" key={k.label}>
+            <div className="stat-label">{k.label}</div>
+            <div className={`stat-value ${k.cls}`}>{k.value}</div>
+          </div>
         ))}
       </div>
 
-      <div className="table-wrap">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Campaign</th>
-              <th>Canal</th>
-              <th>Geo</th>
-              <th>OS</th>
-              <th className="num">Spend</th>
-              <th className="num">CPI</th>
-              <th className="num">D7 ROAS</th>
-              <th className="num">D30 ROAS</th>
-              <th className="num">D30/D7</th>
-              <th className="num">Install Gap</th>
-              <th>Action</th>
-              <th className="num">Proposed / mo</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((c) => (
-              <Fragment key={c.id}>
-                <tr onClick={() => setExpanded(expanded === c.id ? null : c.id)}>
-                  <td className="mono">{c.id}</td>
-                  <td>{c.canal}</td>
-                  <td>{c.geo}</td>
-                  <td>{c.os}</td>
-                  <td className="num">{fmt.usd(c.totalSpend)}</td>
-                  <td className="num">${c.cpi.toFixed(2)}</td>
-                  <td className="num">{fmt.pct(c.d7Roas)}</td>
-                  <td className="num">{fmt.pct(c.d30Roas)}</td>
-                  <td className="num">{fmt.x(c.d30d7Ratio)}</td>
-                  <td className="num">{fmt.pct(c.installGapPct)}</td>
-                  <td>
-                    <ActionBadge action={c.action} />
-                  </td>
-                  <td className="num">{fmt.usd(c.proposedMonthly)}</td>
-                </tr>
-                {expanded === c.id && (
-                  <tr className="reason-row">
-                    <td colSpan={12}>{c.reason}</td>
-                  </tr>
-                )}
-              </Fragment>
-            ))}
-          </tbody>
-        </table>
+      <div style={{display:'flex',gap:6,marginBottom:16,flexWrap:'wrap',justifyContent:'space-between'}}>
+        <div style={{display:'flex',gap:6}}>
+          {views.map(v=>(
+            <button key={v.key} onClick={()=>setBreakdown(v.key)} style={{fontSize:12,fontWeight:600,padding:'6px 14px',borderRadius:'var(--radius-sm)',border:'1px solid',cursor:'pointer',background:breakdown===v.key?'var(--rose)':'var(--bg-3)',color:breakdown===v.key?'#fff':'var(--text-2)',borderColor:breakdown===v.key?'var(--rose)':'var(--border)'}}>
+              {v.label}
+            </button>
+          ))}
+        </div>
+        <button onClick={()=>setShowGlossary(g=>!g)} style={{fontSize:11,fontWeight:600,padding:'6px 14px',borderRadius:'var(--radius-sm)',border:'1px solid var(--border)',cursor:'pointer',background:'var(--bg-3)',color:showGlossary?'var(--rose-light)':'var(--text-2)'}}>
+          {showGlossary ? 'Cerrar glosario' : '? Glosario'}
+        </button>
       </div>
-    </div>
+
+      {showGlossary && (
+        <div className="card" style={{marginBottom:24}}>
+          <div style={{fontSize:13,fontWeight:700,color:'var(--text-0)',marginBottom:12}}>Acciones</div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:10}}>
+            {Object.entries(ACTION_DESC).map(([k,v])=>(
+              <div key={k} style={{background:'var(--bg-3)',borderRadius:'var(--radius)',padding:'10px 14px',borderLeft:`3px solid ${ACTION_COLOR[k as Action]}`}}>
+                <div style={{fontSize:11,fontWeight:700,color:ACTION_COLOR[k as Action],marginBottom:4}}>{k}</div>
+                <div style={{fontSize:12,color:'var(--text-2)',lineHeight:1.5}}>{v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {breakdown !== 'campaign' && (
+        <div style={{marginBottom:24}}>
+          <div className="table-wrap">
+            <table>
+              <thead><tr>
+                <th>{breakdown==='geo'?'GEO':breakdown==='canal'?'Canal':'OS'}</th>
+                <th>Spend Hist.</th><th>Budget/mo</th><th>% Total</th><th>D7 Rev</th><th>D7 ROAS</th>
+                {breakdown!=='canal'&&<th>Installs MMP</th>}
+              </tr></thead>
+              <tbody>
+                {(breakdown==='geo'?geoMap:breakdown==='canal'?canalMap:osMap).map(([key,v])=>(
+                  <tr key={key}>
+                    <td className="bold">{key}</td>
+                    <td className="mono">{fmt.usd(v.spend)}</td>
+                    <td className="bold" style={{color:'var(--rose-light)'}}>{fmt.usd(v.budget)}</td>
+                    <td className="mono">{fmt.pct(v.budget/total)}</td>
+                    <td className="mono" style={{color:'var(--green)'}}>{fmt.usd(v.d7rev)}</td>
+                    <td className="mono" style={{color:v.d7rev/v.spend>=0.35?'var(--green)':v.d7rev/v.spend>=0.20?'var(--amber)':'var(--red)'}}>{fmt.pct(v.d7rev/v.spend)}</td>
+                    {breakdown!=='canal'&&<td className="mono">{fmt.num((v as {installs:number}).installs)}</td>}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {breakdown === 'campaign' && (
+        <>
+          <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:16}}>
+            {actions.map(a=>(
+              <button key={a} onClick={()=>setFilter(a)} style={{fontSize:10,fontWeight:700,letterSpacing:'0.08em',textTransform:'uppercase',padding:'4px 10px',borderRadius:99,border:'1px solid',cursor:'pointer',background:filter===a?'var(--rose)':'var(--bg-3)',color:filter===a?'#fff':'var(--text-2)',borderColor:filter===a?'var(--rose)':'var(--border)'}}>
+                {a}
+              </button>
+            ))}
+          </div>
+          <div className="table-wrap">
+            <table>
+              <thead><tr>
+                <th>Campaign</th><th>Canal</th><th>Geo</th><th>OS</th>
+                <Th k="totalSpend">Spend</Th>
+                <Th k="singularInstalls">Installs</Th>
+                <Th k="cpi">CPI</Th>
+                <Th k="d7Roas">D7 ROAS</Th>
+                <Th k="d30Roas">D30 ROAS</Th>
+                <Th k="d30d7Ratio">D30/D7</Th>
+                <Th k="installGapPct">Gap</Th>
+                <th>Action</th>
+                <Th k="proposedMonthly">Budget/mo</Th>
+                <th>Razon</th>
+              </tr></thead>
+              <tbody>
+                {filtered.map(c=>{
+                  const col = ACTION_COLOR[c.action];
+                  return (
+                    <tr key={c.id} style={{opacity:c.action==='KILL'?0.45:1}}>
+                      <td style={{fontFamily:'var(--mono)',fontSize:10,color:'var(--text-2)'}}>{c.id}</td>
+                      <td>{c.canal}</td><td>{c.geo}</td><td>{c.os}</td>
+                      <td className="mono">{fmt.usd(c.totalSpend)}</td>
+                      <td className="mono">{fmt.num(c.singularInstalls)}</td>
+                      <td className="mono">{c.cpi>0?fmt.usd(c.cpi):'—'}</td>
+                      <td className="mono" style={{color:c.d7Roas>=0.35?'var(--green)':c.d7Roas>=0.20?'var(--amber)':c.d7Roas>0?'var(--red)':'var(--text-3)'}}>{c.d7Roas>0?fmt.pct(c.d7Roas):'—'}</td>
+                      <td className="mono" style={{color:c.d30Roas>=0.40?'var(--green)':c.d30Roas>=0.25?'var(--amber)':c.d30Roas>0?'var(--red)':'var(--text-3)'}}>{c.d30Roas>0?fmt.pct(c.d30Roas):'—'}</td>
+                      <td className="mono" style={{color:c.d30d7Ratio>=1.2?'var(--blue)':'var(--text-2)'}}>{c.d30d7Ratio>0?`${c.d30d7Ratio.toFixed(2)}x`:'—'}</td>
+                      <td className="mono" style={{color:c.installGapPct>0.30?'var(--red)':c.installGapPct>0.10?'var(--amber)':'var(--text-2)'}}>{c.installGapPct>0?`-${fmt.pct(c.installGapPct)}`:c.action==='KILL'?'—':'~0%'}</td>
+                      <td><span style={{display:'inline-block',fontSize:9,fontWeight:700,letterSpacing:'0.07em',textTransform:'uppercase',padding:'3px 7px',borderRadius:99,background:`${col}18`,color:col,border:`1px solid ${col}40`}}>{c.action}</span></td>
+                      <td className="bold" style={{color:c.proposedMonthly>0?'var(--text-0)':'var(--red)'}}>{c.proposedMonthly>0?fmt.usd(c.proposedMonthly):'$0'}</td>
+                      <td style={{color:'var(--text-2)',fontSize:11,whiteSpace:'normal',lineHeight:1.5,minWidth:240}}>{c.reason}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div style={{marginTop:24,display:'flex',flexDirection:'column',gap:6}}>
+            {campaigns.filter(c=>c.proposedMonthly>0).sort((a,b)=>b.proposedMonthly-a.proposedMonthly).map(c=>(
+              <div key={c.id} style={{display:'flex',alignItems:'center',gap:12}}>
+                <div style={{width:190,fontSize:10,fontFamily:'var(--mono)',color:'var(--text-2)',textAlign:'right',flexShrink:0}}>{c.id}</div>
+                <div style={{flex:1,height:20,background:'var(--bg-3)',borderRadius:4,overflow:'hidden'}}>
+                  <div style={{height:'100%',width:`${(c.proposedMonthly/TOTAL_BUDGET_MONTHLY)*100}%`,background:ACTION_COLOR[c.action],borderRadius:4,display:'flex',alignItems:'center',paddingLeft:8,opacity:0.85}}>
+                    <span style={{fontSize:10,fontWeight:700,color:'#000',opacity:0.8}}>{fmt.usd(c.proposedMonthly)}</span>
+                  </div>
+                </div>
+                <span style={{fontSize:10,color:ACTION_COLOR[c.action],flexShrink:0,width:50,textAlign:'right'}}>{c.action}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </section>
   );
 }

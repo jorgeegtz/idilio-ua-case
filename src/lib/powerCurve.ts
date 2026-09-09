@@ -8,19 +8,15 @@ export function forecast(p: CurveParams, spend: number): number {
   if (spend <= 0 || p.a <= 0 || p.b <= 0) return 0;
   return p.a * Math.pow(spend, p.b);
 }
-
 export function roasAtSpend(p: CurveParams, spend: number): number {
   if (spend <= 0) return 0;
   return forecast(p, spend) / spend;
 }
-
 export function mroas(p: CurveParams, spend: number, delta = DELTA): number {
   if (spend <= 0 || p.a <= 0) return 0;
   return (forecast(p, spend + delta) - forecast(p, spend)) / delta;
 }
-
 export interface CampaignInput { id: string; params: CurveParams; minSpendDaily?: number; maxSpendDaily?: number; }
-
 export function waterfallAllocate(totalDailyBudget: number, channels: CampaignInput[]): WaterfallResult {
   const spend: Record<string, number> = {};
   for (const c of channels) spend[c.id] = Math.max(DELTA, c.minSpendDaily ?? 0);
@@ -45,9 +41,7 @@ export function waterfallAllocate(totalDailyBudget: number, channels: CampaignIn
   const totalDailySpend = allocations.reduce((s, a) => s + a.dailySpend, 0);
   return { allocations, totalDailyRev, totalMonthlyRev: totalDailyRev * 30, blendedRoas: totalDailySpend > 0 ? totalDailyRev / totalDailySpend : 0 };
 }
-
 export interface ScenarioPoint { budget: number; dailyBudget: number; dailyRev: number; monthlyRev: number; roas: number; }
-
 export function scenarioSweep(budgetMin: number, budgetMax: number, channels: CampaignInput[], nIntervals = 20): ScenarioPoint[] {
   return Array.from({ length: nIntervals }, (_, i) => {
     const monthlyBudget = budgetMin + i * (budgetMax - budgetMin) / (nIntervals - 1);
@@ -56,7 +50,6 @@ export function scenarioSweep(budgetMin: number, budgetMax: number, channels: Ca
     return { budget: monthlyBudget, dailyBudget, dailyRev: result.totalDailyRev, monthlyRev: result.totalMonthlyRev, roas: result.blendedRoas };
   });
 }
-
 export const fmt = {
   usd: (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v),
   pct: (v: number) => `${(v * 100).toFixed(1)}%`,

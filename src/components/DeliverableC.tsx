@@ -1,152 +1,84 @@
-import { useMemo } from 'react';
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
-import { activeCampaigns, TOTAL_BUDGET_MONTHLY } from '../data/campaigns';
-import { fmt, scenarioSweep, waterfallAllocate, type CampaignInput } from '../lib/powerCurve';
-
-const BUDGET_MIN = 40000;
-const BUDGET_MAX = 280000;
-const INTERVALS = 25;
-
 export default function DeliverableC() {
-  const channels: CampaignInput[] = useMemo(
-    () => activeCampaigns.map((c) => ({ id: c.id, params: { a: c.curveA, b: c.curveB } })),
-    [],
-  );
-
-  const points = useMemo(
-    () => scenarioSweep(BUDGET_MIN, BUDGET_MAX, channels, INTERVALS),
-    [channels],
-  );
-
-  const chartData = points.map((p) => ({
-    budget: p.budget,
-    monthlyRev: p.monthlyRev,
-    roas: Number((p.roas * 100).toFixed(1)),
-  }));
-
-  const atCurrent = useMemo(() => {
-    const dailyBudget = TOTAL_BUDGET_MONTHLY / 30;
-    const r = waterfallAllocate(dailyBudget, channels);
-    return { monthlyRev: r.totalMonthlyRev, roas: r.blendedRoas };
-  }, [channels]);
-
-  const atDouble = useMemo(() => {
-    const dailyBudget = (TOTAL_BUDGET_MONTHLY * 2) / 30;
-    const r = waterfallAllocate(dailyBudget, channels);
-    return { monthlyRev: r.totalMonthlyRev, roas: r.blendedRoas };
-  }, [channels]);
-
-  const efficiencyLoss = 1 - atDouble.roas / atCurrent.roas;
-
   return (
-    <div>
-      <div className="section-head">
-        <h2>Deliverable C — Scenario Planning</h2>
-        <p>
-          Sweeping total monthly budget from {fmt.usd(BUDGET_MIN)} to {fmt.usd(BUDGET_MAX)},
-          reallocating optimally at each step, to show where the blended power curve starts
-          bending — i.e. how much budget the current 11 live channels can actually absorb before
-          ROAS erodes.
-        </p>
+    <section id="deliverable-c">
+      <div className="section-header">
+        <span className="section-tag">Deliverable C</span>
+        <h2>Plan Operacional</h2>
+        <p>Ejecutable desde el lunes. Cinco sistemas, cero ambiguedad.</p>
       </div>
-
-      <div className="stat-grid">
-        <div className="stat-card">
-          <span className="stat-label">Rev @ current budget ({fmt.usd(TOTAL_BUDGET_MONTHLY)})</span>
-          <span className="stat-value">{fmt.usd(atCurrent.monthlyRev)}</span>
-          <span className="stat-sub">{fmt.x(atCurrent.roas)} blended ROAS</span>
+      <div className="ops-grid">
+        <div className="ops-card">
+          <div style={{fontSize:20,marginBottom:10}}>🏷️</div>
+          <h4>1 — Naming Convention</h4>
+          <ul>
+            <li>Formato: [CANAL]_[GEO]_[OS]_[OBJETIVO]</li>
+            <li>Canales: MET · GAC · TT · NET · APL</li>
+            <li>Geos: MX · CO · USH · US</li>
+            <li>OS: AND · IOS · W2A</li>
+            <li>Objetivos: BROAD · TROAS · RTG · AEO · INSTALL</li>
+            <li>Nunca renombrar campana live — clonar y pausar</li>
+          </ul>
         </div>
-        <div className="stat-card">
-          <span className="stat-label">Rev @ 2x budget ({fmt.usd(TOTAL_BUDGET_MONTHLY * 2)})</span>
-          <span className="stat-value">{fmt.usd(atDouble.monthlyRev)}</span>
-          <span className="stat-sub">{fmt.x(atDouble.roas)} blended ROAS</span>
+        <div className="ops-card">
+          <div style={{fontSize:20,marginBottom:10}}>🎬</div>
+          <h4>2 — Creative Testing</h4>
+          <ul>
+            <li>Max 3 creativos nuevos por campana por semana</li>
+            <li>Minimo $500 y 7 dias antes de kill</li>
+            <li>Kill: CTR decay mayor 60% en 14 dias</li>
+            <li>Kill: D7 ROAS menor 20% a $500+ spend</li>
+            <li>Benchmark: CR-15 formato Montaje texto, -29% decay</li>
+            <li>Brief correcto: hook conflicto familiar + recap 3s</li>
+          </ul>
         </div>
-        <div className="stat-card">
-          <span className="stat-label">Efficiency loss if doubled</span>
-          <span className="stat-value" style={{ color: 'var(--hold)' }}>
-            −{fmt.pct(Math.max(0, efficiencyLoss))}
-          </span>
-          <span className="stat-sub">blended ROAS decline</span>
+        <div className="ops-card">
+          <div style={{fontSize:20,marginBottom:10}}>📈</div>
+          <h4>3 — Pacing y Scaling</h4>
+          <ul>
+            <li>Check diario 12PM — flag mayor 15% vs target</li>
+            <li>Scale trigger: D7 ROAS mayor 35% AND mROAS mayor 0.5 por 3 dias</li>
+            <li>Maximo +20% de budget por semana</li>
+            <li>Hold: ROAS entre 20-35%, monitorear 7 dias</li>
+            <li>Cut: ROAS menor 20% a $1K+ spend, reducir 50%</li>
+            <li>Web2App: evaluar en D30, nunca antes</li>
+          </ul>
         </div>
-      </div>
-
-      <div className="card">
-        <span className="card-title">Monthly revenue &amp; blended ROAS vs. total budget</span>
-        <div className="chart-box">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ left: 4, right: 16, top: 4, bottom: 4 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis
-                dataKey="budget"
-                tickFormatter={(v) => fmt.usd(v)}
-                stroke="var(--text)"
-                fontSize={11}
-              />
-              <YAxis
-                yAxisId="rev"
-                tickFormatter={(v) => fmt.usd(v)}
-                stroke="var(--text)"
-                fontSize={11}
-              />
-              <YAxis
-                yAxisId="roas"
-                orientation="right"
-                tickFormatter={(v) => `${v}%`}
-                stroke="var(--text)"
-                fontSize={11}
-              />
-              <Tooltip
-                formatter={(v, name) => (name === 'ROAS' ? `${v}%` : fmt.usd(Number(v)))}
-                labelFormatter={(v) => `Budget: ${fmt.usd(Number(v))}`}
-                contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border)', fontSize: 12 }}
-              />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <ReferenceLine
-                x={TOTAL_BUDGET_MONTHLY}
-                yAxisId="rev"
-                stroke="var(--accent)"
-                strokeDasharray="4 4"
-                label={{ value: 'Current', fill: 'var(--accent)', fontSize: 11, position: 'top' }}
-              />
-              <Line
-                yAxisId="rev"
-                type="monotone"
-                dataKey="monthlyRev"
-                name="Monthly Revenue"
-                stroke="#aa3bff"
-                strokeWidth={2}
-                dot={false}
-              />
-              <Line
-                yAxisId="roas"
-                type="monotone"
-                dataKey="roas"
-                name="ROAS"
-                stroke="#f59e0b"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+        <div className="ops-card">
+          <div style={{fontSize:20,marginBottom:10}}>🔔</div>
+          <h4>4 — Alertas</h4>
+          <ul>
+            <li>Install gap mayor 25% en cualquier campana</li>
+            <li>D7 ROAS cae mayor 15 puntos semana a semana</li>
+            <li>CTR decay mayor 40% vs peak 7 dias</li>
+            <li>Null CV rate iOS mayor 40%</li>
+            <li>Spend diario mayor 20% vs plan a las 6PM</li>
+            <li>Todas las alertas a Slack #ua-alerts</li>
+          </ul>
+        </div>
+        <div className="ops-card">
+          <div style={{fontSize:20,marginBottom:10}}>📊</div>
+          <h4>5 — Reporte Semanal al Founder</h4>
+          <ul>
+            <li>Lunes 9AM, semana anterior</li>
+            <li>Una linea: gasto, revenue D7, ROAS, 1 win, 1 riesgo</li>
+            <li>Top 3 campanas por D7 ROAS</li>
+            <li>1 campana con problema y accion tomada</li>
+            <li>Pacing vs plan del mes</li>
+            <li>UN solo ask de aprobacion — nunca mas de uno</li>
+          </ul>
+        </div>
+        <div className="ops-card" style={{borderColor:'var(--rose-dim)',background:'rgba(232,23,93,0.04)'}}>
+          <div style={{fontSize:20,marginBottom:10}}>⚠️</div>
+          <h4>Semana 1 — Acciones tecnicas primero</h4>
+          <ul>
+            <li>Pausar AdNet-X y TT_USH_IOS_BROAD</li>
+            <li>Audit MMP: ventanas de atribucion, S2S postback, FX</li>
+            <li>Activar AEM en Meta iOS con purchase como CV primario</li>
+            <li>Confirmar LDM en Google iOS</li>
+            <li>TikTok iOS: no reactivar hasta confirmar modelado SKAN</li>
+          </ul>
         </div>
       </div>
-
-      <div className="note">
-        The curve is calibrated on current spend levels per channel — the fit is most reliable
-        near the observed range and gets speculative past ~1.5–2x historical spend, especially
-        for the untested US-general TEST line. Use this to size the next budget conversation, not
-        as a guaranteed forecast.
-      </div>
-    </div>
+    </section>
   );
 }
