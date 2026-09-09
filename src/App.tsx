@@ -20,6 +20,10 @@ const channels = activeCampaigns
   .map(c => ({ id: c.id, params: { a: c.curveA, b: c.curveB }, minSpendDaily: 10, maxSpendDaily: (c.proposedMonthly / 30) * 2.5 }));
 const baseResult = waterfallAllocate(TOTAL_BUDGET_MONTHLY / 30, channels);
 
+function handleNav(href: string) {
+  document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+}
+
 export default function App() {
   const [activeSection, setActiveSection] = useState('executive-summary');
 
@@ -45,7 +49,7 @@ export default function App() {
               
                 href={l.href}
                 className={activeSection === l.href.slice(1) ? 'active' : ''}
-                onClick={e => { e.preventDefault(); document.querySelector(l.href)?.scrollIntoView({ behavior: 'smooth' }); }}
+                onClick={() => handleNav(l.href)}
               >
                 {l.label}
               </a>
@@ -60,7 +64,6 @@ export default function App() {
           <h1><em>$120,000</em> budget.<br />One decision framework.</h1>
           <p className="hero-sub">
             Análisis completo de UA para una app de micro-dramas en español — MX, CO y US-Hispano.
-            Detección de tráfico inválido, reconciliación MMP, forecasting con curvas de potencia y simulador en vivo.
           </p>
           <div className="hero-stats">
             {[
@@ -89,9 +92,9 @@ export default function App() {
         <Simulator />
 
         <footer>
-          <p>Jorge E. Gutiérrez · UA Media Buyer Case · Idilio TV · {new Date().getFullYear()}</p>
+          <p>Jorge E. Gutiérrez · UA Media Buyer Case · Idilio TV</p>
           <p style={{ marginTop: 6, fontSize: 11 }}>
-            Base Singular (MMP) · Power curve model · Platform spend as billed · iOS capado pendiente AEM/LDM
+            Base Singular (MMP) · Power curve model · Platform spend as billed
           </p>
         </footer>
       </div>
