@@ -59,7 +59,7 @@ export default function DeliverableC() {
           <div style={{fontSize:20,marginBottom:10}}>📊</div>
           <h4>5. Reporte semanal al founder</h4>
           <ul>
-            <li>Lunes 9AM, cubre la semana anterior.</li>
+            <li>Cubre la semana anterior.</li>
             <li>Una línea: gasto, revenue D7, ROAS, 1 win, 1 riesgo.</li>
             <li>Top 3 campañas por D7 ROAS.</li>
             <li>1 campaña con problema y acción tomada.</li>
@@ -69,7 +69,7 @@ export default function DeliverableC() {
         </div>
         <div className="ops-card" style={{borderColor:'var(--purple-dim)',background:'rgba(124,58,237,0.04)'}}>
           <div style={{fontSize:20,marginBottom:10}}>⚠️</div>
-          <h4>Semana 1. Técnico primero</h4>
+          <h4>Prioridad 1. Técnico primero</h4>
           <ul>
             <li>Pausar AdNet-X y TT_USH_IOS_BROAD.</li>
             <li>Audit MMP: ventanas de atribución, S2S postback, FX.</li>

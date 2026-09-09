@@ -71,7 +71,7 @@ export default function DeliverableA() {
   const SortIcon = ({k}: {k:SortKey}) => <span style={{marginLeft:4,color:sortKey===k?'var(--rose)':'var(--text-3)'}}>{sortKey===k?(sortDir==='desc'?'↓':'↑'):'↕'}</span>;
   const Th = ({k,children}:{k:SortKey,children:React.ReactNode}) => <th onClick={()=>handleSort(k)} style={{cursor:'pointer'}}>{children}<SortIcon k={k}/></th>;
   const actions: (Action|'ALL')[] = ['ALL','SCALE','RAISE','TEST','AUDIT','MIGRATE','HOLD','KILL'];
-  const views: {key:BreakdownView,label:string}[] = [{key:'campaign',label:'Campana'},{key:'geo',label:'Geo'},{key:'canal',label:'Canal'},{key:'os',label:'OS'}];
+  const views: {key:BreakdownView,label:string}[] = [{key:'campaign',label:'Campaña'},{key:'geo',label:'Geo'},{key:'canal',label:'Canal'},{key:'os',label:'OS'}];
 
   return (
     <section id="deliverable-a">

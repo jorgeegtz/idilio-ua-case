@@ -76,3 +76,10 @@ input[type='range']::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 .divider{border:none;border-top:1px solid var(--border);margin:64px 0}
 .disclaimer{font-size:12px;color:var(--text-2);border-left:2px solid var(--text-3);padding-left:12px;margin-top:16px;line-height:1.6}
 footer{text-align:center;padding:48px 24px;font-size:12px;color:var(--text-2);border-top:1px solid var(--border)}
+
+.memo-body-full{line-height:1.8;width:100%}
+.memo-body-full h3{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:none;color:var(--purple-light);margin:32px 0 10px}
+.memo-body-full h3:first-child{margin-top:0}
+.memo-body-full p{color:var(--text-1);margin-bottom:14px}
+.memo-body-full strong{color:var(--text-0);font-weight:600}
+.memo-body-full .highlight-box{background:var(--purple-muted);border-left:3px solid var(--purple);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 16px;margin:16px 0;font-size:13px;color:var(--text-0)}
