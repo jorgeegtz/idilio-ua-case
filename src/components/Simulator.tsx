@@ -49,7 +49,7 @@ export default function Simulator() {
         ))}
       </div>
 
-      <div className="simulator-grid">
+      <div className="simulator-grid" style={{display:'grid',gridTemplateColumns:'300px 1fr',gap:24,alignItems:'start'}}>
         <div style={{display:'flex',flexDirection:'column',gap:10}}>
           <div style={{fontSize:11,fontWeight:600,letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--text-2)',marginBottom:4}}>Caps por campana</div>
           {activeCampaigns.filter(c=>c.curveA>0).map(c=>{
