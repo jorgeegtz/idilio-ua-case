@@ -1,18 +1,34 @@
 
 interface Block { title: string; narrative: string; stats: { value: string; desc: string }[]; }
 const BLOCKS: Block[] = [
-  { title: 'El portafolio', narrative: 'Android MX y CO genera el 85% del revenue con el 72% del gasto. Singular es nuestra fuente de verdad para medir y tomar decisiones de budget — pero optimizamos dentro de cada plataforma con sus propios datos, porque para Meta, Google y TikTok esa es su realidad.', stats: [{ value: '35.1%', desc: 'D7 ROAS Singular' }, { value: '43.5%', desc: 'D7 ROAS plataforma referencia' }, { value: '11 de 12', desc: 'campanas activas' }] },
-  { title: 'La audiencia que convierte', narrative: 'Un solo geo-OS tiene retencion, ROAS y senal MMP confiable al mismo tiempo.', stats: [{ value: '41.8%', desc: 'MX Android D7 ROAS' }, { value: '$0.48', desc: 'CO Android CPI' }, { value: '33%', desc: 'retencion D1 promedio Android' }] },
-  { title: 'La audiencia sin medicion precisa', narrative: 'iOS tiene potencial — el D30/D7 lo sugiere — pero sin atribucion probabilistica activa los datos de plataforma y Singular no cuadran. Capamos hasta resolver AEM por canal.', stats: [{ value: '-40%', desc: 'install gap iOS' }, { value: '33-36%', desc: 'null CVs SKAN' }, { value: '$8K cap', desc: 'iOS hasta activar AEM' }] },
-  { title: 'La audiencia sin fit', narrative: 'AdNet-X entrega volumen pero no usuarios de Idilio TV. 9 semanas de datos confirman el patron sin mejora.', stats: [{ value: '8%', desc: 'retencion D1 vs 33% portafolio' }, { value: '0.27%', desc: 'conversion a payer vs 1.8-5.7% resto' }, { value: 'Pausar', desc: 'decision' }] },
+  {
+    title: 'El portafolio',
+    narrative: 'Android MX y CO genera el 85% del revenue con el 72% del gasto. Singular es nuestra fuente de verdad para medir y tomar decisiones de budget, pero optimizamos dentro de cada plataforma con sus propios datos — para Meta, Google y TikTok, esa es su realidad.',
+    stats: [{ value: '35.1%', desc: 'D7 ROAS Singular' }, { value: '43.5%', desc: 'D7 ROAS plataforma (referencia)' }, { value: '11 de 12', desc: 'Campañas activas' }]
+  },
+  {
+    title: 'La audiencia que convierte',
+    narrative: 'Solo un geo-OS tiene todo junto: ROAS, retención y señal MMP limpia.',
+    stats: [{ value: '41.8%', desc: 'MX Android D7 ROAS' }, { value: '$0.48', desc: 'CO Android CPI' }, { value: '33%', desc: 'Retención D1 promedio Android' }]
+  },
+  {
+    title: 'La audiencia que no podemos medir',
+    narrative: 'iOS tiene potencial — el D30/D7 lo sugiere — pero sin atribución probabilística activa los datos de plataforma y Singular no cuadran. Cap hasta resolver AEM por canal.',
+    stats: [{ value: '-40%', desc: 'Install gap iOS' }, { value: '33-36%', desc: 'Null CVs SKAN' }, { value: '$8K cap', desc: 'iOS hasta activar AEM' }]
+  },
+  {
+    title: 'La audiencia sin fit',
+    narrative: 'AdNet-X entrega volumen pero no usuarios de Idilio TV. 9 semanas de data confirman el patrón sin mejora.',
+    stats: [{ value: '8%', desc: 'Retención D1 vs. 33% portafolio' }, { value: '0.27%', desc: 'Conversión a payer vs. 1.8-5.7% resto' }, { value: 'Pausar', desc: 'Decisión' }]
+  },
 ];
 export default function ExecutiveSummary() {
   return (
     <section id="executive-summary">
       <div className="section-header">
         <span className="section-tag">Executive Summary</span>
-        <h2>Del portafolio a la campana</h2>
-        <p>$400K historico a $120K proximos 30 dias. Singular basis.</p>
+        <h2>Del portafolio a la campaña</h2>
+        <p>$400K histórico → $120K próximos 30 días. Singular basis.</p>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: 16 }}>
         {BLOCKS.map((block, i) => (
