@@ -84,7 +84,7 @@ export default function DeliverableA() {
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:12,marginBottom:24}}>
         {[
           {label:'Total Budget',value:fmt.usd(total),cls:'rose'},
-          {label:'Campanas activas',value:`${campaigns.filter(c=>c.proposedMonthly>0).length} / ${campaigns.length}`,cls:''},
+          {label:'Campañas activas',value:`${campaigns.filter(c=>c.proposedMonthly>0).length} / ${campaigns.length}`,cls:''},
           {label:'Android %',value:fmt.pct(campaigns.filter(c=>c.os==='Android').reduce((s,c)=>s+c.proposedMonthly,0)/total),cls:'green'},
           {label:'MX + CO %',value:fmt.pct(campaigns.filter(c=>c.geo==='MX'||c.geo==='CO').reduce((s,c)=>s+c.proposedMonthly,0)/total),cls:'green'},
           {label:'iOS cap',value:fmt.usd(campaigns.filter(c=>c.os==='iOS').reduce((s,c)=>s+c.proposedMonthly,0)),cls:''},
