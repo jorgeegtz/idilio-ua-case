@@ -3,17 +3,17 @@ interface Block { title: string; narrative: string; stats: { value: string; desc
 const BLOCKS: Block[] = [
   {
     title: 'El portafolio',
-    narrative: 'Android MX y CO genera el 85% del revenue con el 72% del gasto. Singular es nuestra fuente de verdad para medir y tomar decisiones de budget, pero optimizamos dentro de cada plataforma con sus propios datos — para Meta, Google y TikTok, esa es su realidad.',
-    stats: [{ value: '35.1%', desc: 'D7 ROAS Singular' }, { value: '43.5%', desc: 'D7 ROAS plataforma (referencia)' }, { value: '11 de 12', desc: 'Campañas activas' }]
+    narrative: 'Android MX y CO genera el 85% del revenue con el 72% del gasto. Singular es nuestra fuente de verdad para medir y tomar decisiones de budget, pero optimizamos dentro de cada plataforma con sus propios datos. Para Meta, Google y TikTok, esa es su realidad.',
+    stats: [{ value: '35.1%', desc: 'D7 ROAS Singular' }, { value: '43.5%', desc: 'D7 ROAS plataforma (referencia)' }, { value: '11 de 12', desc: 'Campanas activas' }]
   },
   {
     title: 'La audiencia que convierte',
-    narrative: 'Solo un geo-OS tiene todo junto: ROAS, retención y señal MMP limpia.',
+    narrative: 'Solo un geo-OS tiene todo junto: ROAS, retención y señal MMP limpia al mismo tiempo.',
     stats: [{ value: '41.8%', desc: 'MX Android D7 ROAS' }, { value: '$0.48', desc: 'CO Android CPI' }, { value: '33%', desc: 'Retención D1 promedio Android' }]
   },
   {
     title: 'La audiencia que no podemos medir',
-    narrative: 'iOS tiene potencial — el D30/D7 lo sugiere — pero sin atribución probabilística activa los datos de plataforma y Singular no cuadran. Cap hasta resolver AEM por canal.',
+    narrative: 'iOS tiene potencial, el D30/D7 lo sugiere, pero sin atribución probabilística activa los datos de plataforma y Singular no cuadran. Cap hasta resolver AEM por canal.',
     stats: [{ value: '-40%', desc: 'Install gap iOS' }, { value: '33-36%', desc: 'Null CVs SKAN' }, { value: '$8K cap', desc: 'iOS hasta activar AEM' }]
   },
   {
@@ -28,7 +28,7 @@ export default function ExecutiveSummary() {
       <div className="section-header">
         <span className="section-tag">Executive Summary</span>
         <h2>Del portafolio a la campaña</h2>
-        <p>$400K histórico → $120K próximos 30 días. Singular basis.</p>
+        <p>$400K histórico a $120K próximos 30 días. Singular basis.</p>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: 16 }}>
         {BLOCKS.map((block, i) => (
