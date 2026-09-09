@@ -16,13 +16,13 @@ export default function ExecutiveSummary() {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: 16 }}>
         {BLOCKS.map((block, i) => (
-          <div key={i} style={{ background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '20px 24px', borderTop: '2px solid var(--rose)' }}>
+          <div key={i} style={{ background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '20px 24px', borderTop: '2px solid var(--purple)' }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-0)', marginBottom: 8 }}>{block.title}</div>
             <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.7, marginBottom: 16 }}>{block.narrative}</div>
             <div style={{ display: 'flex', gap: 8 }}>
               {block.stats.map((s, si) => (
                 <div key={si} style={{ flex: 1, background: 'var(--bg-3)', borderRadius: 'var(--radius)', padding: '10px 12px' }}>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--rose-light)', fontFamily: 'var(--mono)', marginBottom: 3 }}>{s.value}</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-0)', fontFamily: 'var(--mono)', marginBottom: 3 }}>{s.value}</div>
                   <div style={{ fontSize: 10, color: 'var(--text-2)', lineHeight: 1.4 }}>{s.desc}</div>
                 </div>
               ))}
