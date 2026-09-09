@@ -1,61 +1,98 @@
-import { useState } from 'react';
-import { ClipboardList, GitBranch, SlidersHorizontal, TrendingUp } from 'lucide-react';
-import { TOTAL_BUDGET_MONTHLY } from './data/campaigns';
-import { fmt } from './lib/powerCurve';
+import { useState, useEffect } from 'react';
 import DeliverableA from './components/DeliverableA';
 import DeliverableB from './components/DeliverableB';
 import DeliverableC from './components/DeliverableC';
 import Simulator from './components/Simulator';
+import ExecutiveSummary from './components/ExecutiveSummary';
+import { fmt, waterfallAllocate } from './lib/powerCurve';
+import { activeCampaigns, TOTAL_BUDGET_MONTHLY } from './data/campaigns';
 
-type Tab = 'a' | 'b' | 'c' | 'sim';
-
-const TABS: { id: Tab; label: string; icon: typeof ClipboardList }[] = [
-  { id: 'a', label: 'A · Performance', icon: ClipboardList },
-  { id: 'b', label: 'B · Waterfall', icon: GitBranch },
-  { id: 'c', label: 'C · Scenarios', icon: TrendingUp },
-  { id: 'sim', label: 'Simulator', icon: SlidersHorizontal },
+const NAV_LINKS = [
+  { href: '#executive-summary', label: 'Summary' },
+  { href: '#deliverable-a',     label: 'A · Budget' },
+  { href: '#deliverable-b',     label: 'B · Memo' },
+  { href: '#deliverable-c',     label: 'C · Ops' },
+  { href: '#simulator',         label: '⚡ Simulator' },
 ];
 
-function App() {
-  const [tab, setTab] = useState<Tab>('a');
+const channels = activeCampaigns
+  .filter(c => c.curveA > 0)
+  .map(c => ({ id: c.id, params: { a: c.curveA, b: c.curveB }, minSpendDaily: 10, maxSpendDaily: (c.proposedMonthly / 30) * 2.5 }));
+const baseResult = waterfallAllocate(TOTAL_BUDGET_MONTHLY / 30, channels);
+
+export default function App() {
+  const [activeSection, setActiveSection] = useState('executive-summary');
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) setActiveSection(e.target.id); }),
+      { rootMargin: '-40% 0px -55% 0px' },
+    );
+    document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="app-shell">
-      <header className="app-header">
+    <div className="app">
+      <nav className="topnav">
         <div className="brand">
-          <h1>Idilio TV — Media Buyer Case</h1>
-          <span>UA performance audit &amp; budget allocation model</span>
+          <span className="dot" />
+          <span>Idilio TV · UA Case</span>
         </div>
-        <span className="budget-pill">Monthly UA budget: {fmt.usd(TOTAL_BUDGET_MONTHLY)}</span>
-      </header>
-
-      <nav className="app-nav">
-        {TABS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            type="button"
-            className={`nav-tab ${tab === id ? 'active' : ''}`}
-            onClick={() => setTab(id)}
-          >
-            <Icon size={15} />
-            {label}
-          </button>
-        ))}
+        <ul className="nav-links">
+          {NAV_LINKS.map(l => (
+            <li key={l.href}>
+              
+                href={l.href}
+                className={activeSection === l.href.slice(1) ? 'active' : ''}
+                onClick={e => { e.preventDefault(); document.querySelector(l.href)?.scrollIntoView({ behavior: 'smooth' }); }}
+              >{l.label}</a>
+            </li>
+          ))}
+        </ul>
       </nav>
 
-      <main className="app-main">
-        {tab === 'a' && <DeliverableA />}
-        {tab === 'b' && <DeliverableB />}
-        {tab === 'c' && <DeliverableC />}
-        {tab === 'sim' && <Simulator />}
-      </main>
+      <div className="content-area">
+        <header className="hero">
+          <p className="hero-eyebrow">Media Buyer / UA Case — Idilio TV</p>
+          <h1><em>$120,000</em> budget.<br />One decision framework.</h1>
+          <p className="hero-sub">
+            Análisis completo de UA para una app de micro-dramas en español — MX, CO y US-Hispano.
+            Detección de tráfico inválido, reconciliación MMP, forecasting con curvas de potencia y simulador en vivo.
+          </p>
+          <div className="hero-stats">
+            {[
+              { label: 'Total Budget',     value: fmt.usd(TOTAL_BUDGET_MONTHLY), cls: 'rose' },
+              { label: 'Fcast D7 Rev/mo',  value: fmt.usd(baseResult.totalMonthlyRev), cls: 'green' },
+              { label: 'Blended ROAS',     value: fmt.pct(baseResult.blendedRoas), cls: '' },
+              { label: 'Campañas activas', value: '11 de 12', cls: '' },
+              { label: 'Candidato',        value: 'Jorge E. Gutiérrez', cls: '' },
+            ].map(s => (
+              <div className="stat-card" key={s.label}>
+                <div className="stat-label">{s.label}</div>
+                <div className={`stat-value ${s.cls}`}>{s.value}</div>
+              </div>
+            ))}
+          </div>
+        </header>
 
-      <footer className="app-footer">
-        Built for the Idilio TV Media Buyer technical case · figures are directional forecasts
-        from fitted power curves, not guarantees.
-      </footer>
+        <ExecutiveSummary />
+        <hr className="divider" />
+        <DeliverableA />
+        <hr className="divider" />
+        <DeliverableB />
+        <hr className="divider" />
+        <DeliverableC />
+        <hr className="divider" />
+        <Simulator />
+
+        <footer>
+          <p>Jorge E. Gutiérrez · UA Media Buyer Case · Idilio TV · {new Date().getFullYear()}</p>
+          <p style={{ marginTop: 6, fontSize: 11 }}>
+            Base Singular (MMP) · Power curve model · Platform spend as billed · iOS capado pendiente AEM/LDM
+          </p>
+        </footer>
+      </div>
     </div>
   );
 }
-
-export default App;
