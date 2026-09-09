@@ -4,7 +4,7 @@ export default function DeliverableC() {
       <div className="section-header">
         <span className="section-tag">Deliverable C</span>
         <h2>Plan operacional</h2>
-        <p>Listo para el lunes.</p>
+        <p>Sin margen de duda.</p>
       </div>
       <div className="ops-grid">
         <div className="ops-card">

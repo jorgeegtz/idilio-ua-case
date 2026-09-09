@@ -4,7 +4,7 @@ const BLOCKS: Block[] = [
   {
     title: 'El portafolio',
     narrative: 'Android MX y CO genera el 85% del revenue con el 72% del gasto. Singular es nuestra fuente de verdad para medir y tomar decisiones de budget, pero optimizamos dentro de cada plataforma con sus propios datos. Para Meta, Google y TikTok, esa es su realidad.',
-    stats: [{ value: '35.1%', desc: 'D7 ROAS Singular' }, { value: '43.5%', desc: 'D7 ROAS plataforma (referencia)' }, { value: '11 de 12', desc: 'Campanas activas' }]
+    stats: [{ value: '35.1%', desc: 'D7 ROAS Singular' }, { value: '43.5%', desc: 'D7 ROAS plataforma (referencia)' }, { value: '11 de 12', desc: 'Campañas activas' }]
   },
   {
     title: 'La audiencia que convierte',
