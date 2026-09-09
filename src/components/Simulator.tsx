@@ -49,7 +49,7 @@ export default function Simulator() {
         ))}
       </div>
 
-      <div className="simulator-grid" style={{display:'grid',gridTemplateColumns:'300px 1fr',gap:24,alignItems:'start'}}>
+      <div style={{display:'grid',gridTemplateColumns:'minmax(280px,320px) 1fr',gap:24,alignItems:'start'}}>
         <div style={{display:'flex',flexDirection:'column',gap:10}}>
           <div style={{fontSize:11,fontWeight:600,letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--text-2)',marginBottom:4}}>Caps por campana</div>
           {activeCampaigns.filter(c=>c.curveA>0).map(c=>{
@@ -72,7 +72,7 @@ export default function Simulator() {
 
         <div>
           <div className="card" style={{padding:'20px 8px 8px'}}>
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={320} minWidth={300}>
               <LineChart data={sweep} margin={{top:4,right:24,bottom:4,left:8}}>
                 <XAxis dataKey="budget" tickFormatter={v=>`$${v}K`} stroke="var(--text-3)" tick={{fontSize:10,fill:'var(--text-2)'}}/>
                 <YAxis yAxisId="rev" tickFormatter={v=>`$${(v/1000).toFixed(0)}K`} stroke="var(--text-3)" tick={{fontSize:10,fill:'var(--text-2)'}}/>

@@ -77,7 +77,7 @@ export default function DeliverableA() {
     <section id="deliverable-a">
       <div className="section-header">
         <span className="section-tag">Deliverable A</span>
-        <h2>Budget Allocation — 30 dias</h2>
+        <h2>Budget allocation — 30 días</h2>
         <p>Total: <strong style={{color:'var(--text-0)'}}>{fmt.usd(TOTAL_BUDGET_MONTHLY)}</strong> · Revenue: Singular · Spend: plataforma as billed</p>
       </div>
 
