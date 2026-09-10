@@ -23,6 +23,10 @@ function goTo(href: string) { document.querySelector(href)?.scrollIntoView({ beh
 export default function App() {
   const [active, setActive] = useState('executive-summary');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
   useEffect(() => {
     const obs = new IntersectionObserver(
       es => es.forEach(e => { if (e.isIntersecting) setActive(e.target.id); }),
