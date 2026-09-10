@@ -87,7 +87,7 @@ export default function Simulator({ theme }: SimProps) {
   };
 
   const channels = useMemo<CampaignInput[]>(() =>
-    BASE_CHANNELS.map(c => ({ ...c, maxSpendDaily: (caps[c.id] ?? c.proposedMonthly) / 30 })), [caps]);
+    BASE_CHANNELS.map(c => ({ ...c, maxSpendDaily: (caps[c.id] ?? activeCampaigns.find(a => a.id === c.id)?.proposedMonthly ?? 0) / 30 })), [caps]);
   const result = useMemo(() => waterfallAllocate(budget / 30, channels), [budget, channels]);
   const sweep  = useMemo(() =>
     scenarioSweep(60000, 200000, channels, 30).map(p => ({
