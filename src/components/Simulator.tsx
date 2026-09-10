@@ -10,10 +10,9 @@ const BASE_CHANNELS: CampaignInput[] = activeCampaigns
 interface ChartProps {
   data: { budget: number; revenue: number; roas: number }[];
   currentBudget: number;
-  isDark: boolean;
 }
 
-function SvgChart({ data, currentBudget, isDark }: ChartProps) {
+function SvgChart({ data, currentBudget }: ChartProps) {
   const W = 800, H = 260, PL = 58, PR = 48, PT = 16, PB = 28;
   const innerW = W - PL - PR;
   const innerH = H - PT - PB;
@@ -131,7 +130,7 @@ export default function Simulator() {
 
       {/* SVG Chart - siempre renderiza */}
       <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: 16, padding: '16px 12px 8px', marginBottom: 28 }}>
-        <SvgChart data={sweep} currentBudget={budget} isDark={isDark} />
+        <SvgChart data={sweep} currentBudget={budget} />
       </div>
 
       {/* Sliders */}
