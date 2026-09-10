@@ -141,9 +141,7 @@ export default function Simulator() {
                 <Tooltip
                   contentStyle={{ background: "var(--bg-3)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
                   labelFormatter={v => `Budget: $${v}K/mo`}
-                  formatter={(val: unknown, name: string) =>
-                    name === "Revenue" ? [fmt.usd(Number(val)), "Rev. mensual"] : [`${val}%`, "ROAS blended"]
-                  }
+                  formatter={(val: unknown) => [`${val}`, ""]}
                 />
                 <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
                 <ReferenceLine
