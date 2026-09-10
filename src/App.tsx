@@ -65,7 +65,7 @@ export default function App() {
       </nav>
       <div className="content-area">
         <header className="hero">
-          <p className="hero-eyebrow">Media Buyer · UA Case · Idilio TV</p>
+          <p className="hero-eyebrow">Assessment · Media Buyer UA · Idilio TV</p>
           <h1><em>$120,000</em> de budget. Un framework.</h1>
           <p className="hero-sub">Análisis de UA para una app de micro-dramas en español — MX, CO y US-Hispano. Singular basis.</p>
           <div className="hero-stats">
