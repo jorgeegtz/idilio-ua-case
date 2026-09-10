@@ -177,3 +177,35 @@ footer{text-align:center;padding:48px 24px;font-size:12px;color:var(--text-2);bo
   .hero-stats { flex-direction: column; }
   .stat-card { min-width: unset; width: 100%; }
 }
+
+.burger-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  font-size: 20px;
+  color: var(--text-0);
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .nav-desktop { display: none !important; }
+  .burger-btn { display: flex !important; align-items: center; justify-content: center; }
+  .content-area { padding: 24px 16px 64px; }
+  .hero { padding-top: calc(var(--nav-h) + 32px); padding-bottom: 32px; margin-bottom: 40px; }
+  .hero h1 { font-size: clamp(1.6rem, 8vw, 2.4rem); }
+  .hero-sub { font-size: 14px; }
+  .hero-stats { gap: 10px; flex-wrap: wrap; }
+  .stat-card { min-width: 0; flex: 1 1 140px; padding: 12px 14px; }
+  .stat-card .stat-value { font-size: 17px; }
+  .section-header h2 { font-size: 1.4rem; }
+  .ops-grid { grid-template-columns: 1fr; }
+  .divider { margin: 40px 0; }
+  nav.topnav { padding: 0 16px; }
+}
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 1.5rem; }
+  .stat-card { flex: 1 1 calc(50% - 10px); }
+}

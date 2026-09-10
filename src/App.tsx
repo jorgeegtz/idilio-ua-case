@@ -41,29 +41,39 @@ export default function App() {
     <div className="app">
       <nav className="topnav">
         <div className="brand"><span className="dot" /><span>Idilio TV · UA Case</span></div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button
             onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-            style={{
-              background: 'var(--bg-3)', border: '1px solid var(--border)',
-              borderRadius: 99, padding: '5px 14px', cursor: 'pointer',
-              fontSize: 12, fontWeight: 600, color: 'var(--text-1)',
-              display: 'flex', alignItems: 'center', gap: 6,
-            }}
+            style={{ background: 'var(--bg-3)', border: '1px solid var(--border)', borderRadius: 99, padding: '5px 14px', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--text-1)' }}
           >
             {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
           </button>
-          <ul className="nav-links">
-          {NAV.map(l => (
-            <li key={l.href}>
-              <a href={l.href} className={active === l.href.slice(1) ? 'active' : ''} onClick={e => { e.preventDefault(); goTo(l.href); }}>
-                {l.label}
-              </a>
-            </li>
-          ))}
+          <ul className="nav-links nav-desktop">
+            {NAV.map(l => (
+              <li key={l.href}>
+                <a href={l.href} className={active === l.href.slice(1) ? 'active' : ''} onClick={e => { e.preventDefault(); goTo(l.href); setMenuOpen(false); }}>
+                  {l.label}
+                </a>
+              </li>
+            ))}
           </ul>
+          <button className="burger-btn" onClick={() => setMenuOpen(o => !o)} aria-label="Menu">
+            {menuOpen ? '✕' : '☰'}
+          </button>
         </div>
       </nav>
+      {menuOpen && (
+        <div style={{ position: 'fixed', top: 'var(--nav-h)', left: 0, right: 0, bottom: 0, background: 'var(--bg-1)', zIndex: 99, display: 'flex', flexDirection: 'column', padding: '24px' }}>
+          {NAV.map(l => (
+            <a key={l.href} href={l.href}
+              onClick={e => { e.preventDefault(); goTo(l.href); setMenuOpen(false); }}
+              style={{ fontSize: 20, fontWeight: 600, color: active === l.href.slice(1) ? 'var(--purple-light)' : 'var(--text-0)', padding: '16px 0', borderBottom: '1px solid var(--border)', textDecoration: 'none' }}
+            >
+              {l.label}
+            </a>
+          ))}
+        </div>
+      )}
       <div className="content-area">
         <header className="hero">
           <p className="hero-eyebrow">Assessment · Media Buyer UA · Idilio TV</p>
