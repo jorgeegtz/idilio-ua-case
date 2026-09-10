@@ -23,6 +23,7 @@ function goTo(href: string) { document.querySelector(href)?.scrollIntoView({ beh
 export default function App() {
   const [active, setActive] = useState('executive-summary');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
