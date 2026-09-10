@@ -86,7 +86,7 @@ export default function App() {
         <hr className="divider" />
         <DeliverableC />
         <hr className="divider" />
-        <Simulator theme={theme} />
+        <Simulator />
         <footer>
           <p>Jorge E. Gutiérrez · UA Media Buyer Case · Idilio TV</p>
         </footer>

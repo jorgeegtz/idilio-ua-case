@@ -31,9 +31,9 @@ function SvgChart({ data, currentBudget, isDark }: ChartProps) {
   const roasPath = data.map((d, i) => `${i===0?'M':'L'}${xP(d.budget).toFixed(1)},${yRo(d.roas).toFixed(1)}`).join(' ');
   const cx = xP(Math.round(currentBudget / 1000));
 
-  const grid   = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
-  const label  = isDark ? '#6e6e88' : '#888899';
-  const legend = isDark ? '#b0b0c8' : '#444458';
+  const grid = 'rgba(128,128,128,0.15)';
+  const label = '#888899';
+  const legend = '#777788';
 
   const yTicks = [0, 0.25, 0.5, 0.75, 1].map(t => ({
     rev:  Math.round(maxRev * t / 1000),
@@ -65,9 +65,7 @@ function SvgChart({ data, currentBudget, isDark }: ChartProps) {
   );
 }
 
-interface SimProps { theme: 'dark' | 'light'; }
-
-export default function Simulator({ theme }: SimProps) {
+export default function Simulator() {
   const [budget, setBudget] = useState(TOTAL_BUDGET_MONTHLY);
   const [caps, setCaps] = useState<Record<string, number>>(
     Object.fromEntries(activeCampaigns.filter(c => c.curveA > 0).map(c => [c.id, c.proposedMonthly]))
