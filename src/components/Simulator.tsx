@@ -73,17 +73,16 @@ export default function Simulator({ theme }: SimProps) {
     Object.fromEntries(activeCampaigns.filter(c => c.curveA > 0).map(c => [c.id, c.proposedMonthly]))
   );
 
-  const isDark = theme === 'dark';
   const t = {
-    bgCard:  isDark ? '#1f1f35' : '#f8f8fc',
-    bgRow:   isDark ? '#26263d' : '#ececf8',
-    border:  isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.08)',
-    text0:   isDark ? '#f5f5f7' : '#111118',
-    text1:   isDark ? '#b0b0c8' : '#444458',
-    text2:   isDark ? '#6e6e88' : '#888899',
-    green:   '#22c55e',
-    amber:   '#f59e0b',
-    red:     '#ef4444',
+    bgCard: 'var(--bg-2)',
+    bgRow:  'var(--bg-3)',
+    border: 'var(--border)',
+    text0:  'var(--text-0)',
+    text1:  'var(--text-1)',
+    text2:  'var(--text-2)',
+    green:  '#22c55e',
+    amber:  '#f59e0b',
+    red:    '#ef4444',
   };
 
   const channels = useMemo<CampaignInput[]>(() =>
