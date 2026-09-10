@@ -22,6 +22,7 @@ function goTo(href: string) { document.querySelector(href)?.scrollIntoView({ beh
 
 export default function App() {
   const [active, setActive] = useState('executive-summary');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   useEffect(() => {
     const obs = new IntersectionObserver(
       es => es.forEach(e => { if (e.isIntersecting) setActive(e.target.id); }),
@@ -35,7 +36,19 @@ export default function App() {
     <div className="app">
       <nav className="topnav">
         <div className="brand"><span className="dot" /><span>Idilio TV · UA Case</span></div>
-        <ul className="nav-links">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <button
+            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+            style={{
+              background: 'var(--bg-3)', border: '1px solid var(--border)',
+              borderRadius: 99, padding: '5px 14px', cursor: 'pointer',
+              fontSize: 12, fontWeight: 600, color: 'var(--text-1)',
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+          </button>
+          <ul className="nav-links">
           {NAV.map(l => (
             <li key={l.href}>
               <a href={l.href} className={active === l.href.slice(1) ? 'active' : ''} onClick={e => { e.preventDefault(); goTo(l.href); }}>
@@ -43,7 +56,8 @@ export default function App() {
               </a>
             </li>
           ))}
-        </ul>
+          </ul>
+        </div>
       </nav>
       <div className="content-area">
         <header className="hero">
@@ -72,7 +86,7 @@ export default function App() {
         <hr className="divider" />
         <DeliverableC />
         <hr className="divider" />
-        <Simulator />
+        <Simulator theme={theme} />
         <footer>
           <p>Jorge E. Gutiérrez · UA Media Buyer Case · Idilio TV</p>
         </footer>

@@ -13,7 +13,19 @@ const BASE_CHANNELS: CampaignInput[] = activeCampaigns
     maxSpendDaily: (c.proposedMonthly / 30) * 2.5,
   }));
 
-export default function Simulator() {
+interface SimProps { theme: 'dark' | 'light'; }
+
+export default function Simulator({ theme }: SimProps) {
+  const isDark = theme === 'dark';
+  const tc = {
+    bg:     isDark ? '#1f1f35' : '#f8f8fc',
+    border: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.08)',
+    text0:  isDark ? '#f5f5f7' : '#111118',
+    text1:  isDark ? '#b0b0c8' : '#444458',
+    text2:  isDark ? '#6e6e88' : '#888899',
+    bgRow:  isDark ? '#26263d' : '#ececf8',
+  };
+
   const [budget, setBudget] = useState(TOTAL_BUDGET_MONTHLY);
   const [caps, setCaps] = useState<Record<string, number>>(
     Object.fromEntries(activeCampaigns.filter(c => c.curveA > 0).map(c => [c.id, c.proposedMonthly]))
@@ -116,8 +128,8 @@ export default function Simulator() {
 
         {/* Chart */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ width: "100%", height: 320, background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: "20px 12px 12px" }}>
-            <ResponsiveContainer width="100%" height="100%">
+          <div style={{ width: "100%", height: 320, background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: "16px 8px 8px" }}>
+            <ResponsiveContainer width="100%" height={280}>
               <LineChart data={sweep} margin={{ top: 4, right: 28, bottom: 4, left: 8 }}>
                 <XAxis
                   dataKey="budget"
@@ -139,7 +151,7 @@ export default function Simulator() {
                   tick={{ fontSize: 10, fill: "var(--text-2)" }}
                 />
                 <Tooltip
-                  contentStyle={{ background: "var(--bg-3)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
+                  contentStyle={{ background: tc.bgRow, border: `1px solid ${tc.border}`, borderRadius: 8, fontSize: 12, color: tc.text0 }}
                   labelFormatter={v => `Budget: $${v}K/mo`}
                   formatter={(val: unknown) => [`${val}`, ""]}
                 />
